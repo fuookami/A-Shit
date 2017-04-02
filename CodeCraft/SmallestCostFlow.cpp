@@ -8,17 +8,17 @@ namespace SmallestCostFlow
 	static GraphMatrix graph;
 	static size_t nodeSize;
 	static int minCost = 0;
-	static Graph *pGraph;
+	const Graph * pGraph;
 }
 
-FlowSolution SmallestCostFlow::getSmallestCostFlow(BoolTable servers, Graph & g)
+FlowSolution SmallestCostFlow::getSmallestCostFlow(BoolTable servers, const Graph & g)
 {
 	SubFun::initGraph(servers, g);
 	SubFun::minCostMaxFlow();
 	return SubFun::flowSolution;
 }
 
-void SmallestCostFlow::SubFun::initGraph(BoolTable & server, Graph & g)
+void SmallestCostFlow::SubFun::initGraph(BoolTable & server, const Graph & g)
 {
 	minCost = 0;
 	flowSolution.flows.clear();
