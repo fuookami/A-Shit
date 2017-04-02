@@ -129,7 +129,7 @@ void SmallestCostFlow::SubFun::minCostMaxFlow()
 			{
 				increase = graph[path[i]][path[i + 1]].first;
 			}
-			flow.edges.push_back(pGraph->nodes[path[i]]->edges[path[i + 1]]);
+			flow.edges.push_back(pGraph->nodes[path[i]-1]->edges[path[i + 1]-1]);
 			cout << path[i]-1 << " ";
 		}
 		flow.edges.pop_back();
