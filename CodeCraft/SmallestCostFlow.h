@@ -30,6 +30,5 @@ namespace SmallestCostFlow
 
 		//void removeSourceNode();
 
-		static FlowSolution flowSolution;
 	};
 };
