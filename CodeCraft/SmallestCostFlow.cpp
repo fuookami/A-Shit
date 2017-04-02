@@ -9,19 +9,20 @@ namespace SmallestCostFlow
 	static size_t nodeSize;
 	static int minCost = 0;
 	const Graph * pGraph;
+	static FlowSolution flowSolution;
 }
 
 FlowSolution SmallestCostFlow::getSmallestCostFlow(BoolTable servers, const Graph & g)
 {
-	FlowSolution flowSolution;
-	SubFun::initGraph(flowSolution, servers, g);
-	SubFun::minCostMaxFlow(flowSolution);
-	return std::move(flowSolution);
+	SubFun::initGraph(servers, g);
+	SubFun::minCostMaxFlow();
+	return flowSolution;
 }
 
-void SmallestCostFlow::SubFun::initGraph(FlowSolution &flowSolution, BoolTable & server, const Graph & g)
+void SmallestCostFlow::SubFun::initGraph(BoolTable & server, const Graph & g)
 {
 	minCost = 0;
+	flowSolution.flows.clear();
 	graph = g.graphMatrix;
 	pGraph = &g;
 	nodeSize = graph.size();
@@ -102,7 +103,7 @@ void SmallestCostFlow::SubFun::dijkstra(std::vector<int> &distance, std::vector<
 	reverse(path.begin(), path.end());
 }
 
-void SmallestCostFlow::SubFun::minCostMaxFlow(FlowSolution &flowSolution)
+void SmallestCostFlow::SubFun::minCostMaxFlow()
 {
 	Flow flow;
 
@@ -128,13 +129,13 @@ void SmallestCostFlow::SubFun::minCostMaxFlow(FlowSolution &flowSolution)
 			{
 				increase = graph[path[i]][path[i + 1]].first;
 			}
-			flow.edges.push_back(pGraph->nodes[path[i]-1]->edges[path[i + 1]-1]);
-			cout << path[i]-1 << " ";
+			flow.edges.push_back(pGraph->nodes[path[i] - 1]->edges[path[i + 1] - 1]);
+			cout << path[i] - 1 << " ";
 		}
 		flow.edges.pop_back();
 
 		flow.flow = increase;
-		cout << "  \t" <<increase<< endl;
+		cout << "  \t" << increase << endl;
 
 		for (int i = 0; i < path.size() - 1; ++i)
 		{
@@ -161,3 +162,4 @@ void SmallestCostFlow::SubFun::minCostMaxFlow(FlowSolution &flowSolution)
 	}
 	flowSolution.totalCost = minCost;
 }
+
