@@ -125,6 +125,7 @@
     <Text Include="case2.txt" />
     <Text Include="case3.txt" />
     <Text Include="case4.txt" />
+    <Text Include="result.txt" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="deploy.h" />

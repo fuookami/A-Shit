@@ -18,11 +18,11 @@ struct FlowSolution
 
 namespace SmallestCostFlow
 {
-	FlowSolution getSmallestCostFlow(BoolTable servers, Graph &g);
+	FlowSolution getSmallestCostFlow(BoolTable servers, const Graph &g);
 
 	namespace SubFun
 	{
-		void initGraph(BoolTable &server, Graph &g);
+		void initGraph(BoolTable &server, const Graph &g);
 
 		void dijkstra(std::vector<int> &distance, std::vector<int> &path);
 
