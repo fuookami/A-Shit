@@ -1,4 +1,5 @@
 #include "GenerateIntialSolutions.h"
+#include <iostream>
 #include <deque>
 #include <algorithm>
 #include <random>

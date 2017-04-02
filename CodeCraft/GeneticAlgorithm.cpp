@@ -1,9 +1,9 @@
 ﻿#include "GeneticAlgorithm.h"
+#include "deploy.h"
 #include <iostream>
 #include <sstream>
 #include <sys/timeb.h>
 #include <random>
-
 
 std::vector<BoolTable> old_population;
 std::vector<BoolTable> new_population;
@@ -177,7 +177,7 @@ Solution GeneticAlgorithm::generateSolution(std::vector<BoolTable> intialSolutio
 		}
 
 		ftime(&rawtime);
-		interval_ms += SubFun::timeb2ms(rawtime);
+		interval_ms += timeb2ms(rawtime);
 		if (interval_ms - last_interval_ms > maxTime)
 			maxTime = interval_ms - last_interval_ms;
 		lastTime *= raw_count_it_sum;
@@ -210,23 +210,11 @@ Solution GeneticAlgorithm::generateSolution(std::vector<BoolTable> intialSolutio
 		}
 
 		ftime(&rawtime);
-		interval_ms += SubFun::timeb2ms(rawtime);
+		interval_ms += timeb2ms(rawtime);
 		if (interval_ms - last_interval_ms > maxTime)
 			maxTime = interval_ms - last_interval_ms;
 		last_interval_ms = interval_ms;
 	}
 
 	return std::move(minCost);
-}
-
-unsigned long GeneticAlgorithm::SubFun::timeb2ms(const timeb & t)
-{
-	static int ms = t.millitm;
-	static unsigned long s = t.time;
-	int out_ms = t.millitm - ms;
-	unsigned long out_s = t.time - s;
-	ms = t.millitm;
-	s = t.time;
-
-	return out_s * 1000 + out_ms;
 }

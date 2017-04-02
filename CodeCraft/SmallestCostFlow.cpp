@@ -1,5 +1,6 @@
 #include "SmallestCostFlow.h"
 #include <iostream>
+#include <algorithm>
 
 using namespace std;
 
@@ -27,13 +28,13 @@ void SmallestCostFlow::SubFun::initGraph(BoolTable & server, const Graph & g)
 	pGraph = &g;
 	nodeSize = graph.size();
 
-	for (int i = 0; i < nodeSize - 1; ++i)
+	for (unsigned int i = 0; i != nodeSize - 1; ++i)
 	{
 		if (server[i])
 		{
 			graph[0][i + 1].first = INT_MAX;
 			graph[0][i + 1].second = 0;
-			for (int j = 1; j < nodeSize - 1; ++j)
+			for (unsigned int j = 1; j != nodeSize - 1; ++j)
 			{
 				if (graph[i][j].first != 0)
 				{
@@ -53,8 +54,8 @@ void SmallestCostFlow::SubFun::dijkstra(std::vector<int> &distance, std::vector<
 	vector<int> pre;
 	pre.assign(nodeSize, -1);
 
-	int v = 0;
-	for (v = 0; v < nodeSize; ++v)
+	unsigned int v = 0;
+	for (v = 0; v != nodeSize; ++v)
 	{
 		distance[v] = graph[0][v].second;
 		if (distance[v] != INT_MAX)
@@ -65,10 +66,10 @@ void SmallestCostFlow::SubFun::dijkstra(std::vector<int> &distance, std::vector<
 	distance[0] = 0;
 	isVisited[0] = true;
 
-	for (int i = 0; i < nodeSize; ++i)
+	for (unsigned int i = 0; i != nodeSize; ++i)
 	{
 		int minDistance = INT_MAX;
-		for (int w = 0; w < nodeSize; ++w)
+		for (unsigned int w(0); w != nodeSize; ++w)
 		{
 			if (!isVisited[w] && distance[w] < minDistance)
 			{
@@ -77,7 +78,7 @@ void SmallestCostFlow::SubFun::dijkstra(std::vector<int> &distance, std::vector<
 			}
 		}
 		isVisited[v] = true;
-		for (int w = 0; w < nodeSize; ++w)
+		for (unsigned int w(0); w != nodeSize; ++w)
 		{
 			if (!isVisited[w] && graph[v][w].second != INT_MAX &&
 				minDistance + graph[v][w].second < distance[w])
@@ -121,7 +122,7 @@ void SmallestCostFlow::SubFun::minCostMaxFlow()
 		flow.serverNodeId = path[0] - 1;
 
 		int increase = INT_MAX;
-		for (int i = 0; i < path.size() - 1; ++i)
+		for (unsigned int i(0); i != path.size() - 1; ++i)
 		{
 			if (graph[path[i]][path[i + 1]].first < increase)
 			{
@@ -133,7 +134,7 @@ void SmallestCostFlow::SubFun::minCostMaxFlow()
 
 		flow.flow = increase;
 
-		for (int i = 0; i < path.size() - 1; ++i)
+		for (unsigned int i(0); i != path.size() - 1; ++i)
 		{
 			if (graph[path[i]][path[i + 1]].first != INT_MAX)
 			{

@@ -2,8 +2,6 @@
 
 #include "SmallestCostFlow.h"
 #include "GenerateIntialSolutions.h"
-#include <sys/timeb.h>
-#include <time.h>
 
 struct Solution
 {
@@ -19,7 +17,6 @@ namespace GeneticAlgorithm
 
 	namespace SubFun
 	{
-		inline unsigned long timeb2ms(const timeb &t);
 		// to do
 		static const unsigned long limit_time = 84000;
 		static const double mutation_rate = 0.1;

@@ -8,6 +8,10 @@
 #include <unordered_set>
 #include <memory>
 
+#ifndef INT_MAX
+#define INT_MAX 2147483647
+#endif
+
 struct Edge;
 struct Node;
 struct Graph;

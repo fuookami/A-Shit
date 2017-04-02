@@ -1,9 +1,9 @@
 ﻿#include "GeneticAlgorithm.h"
+#include "deploy.h"
 #include <iostream>
 #include <sstream>
 #include <sys/timeb.h>
 #include <random>
-
 
 std::vector<BoolTable> old_population;
 std::vector<BoolTable> new_population;
@@ -18,7 +18,7 @@ int RWS()
 {
 	double m = 0;
 	double  r = Rand();
-	for (int i = 0; i < fitness_rate.size(); i++)
+	for (unsigned int i(0); i < fitness_rate.size(); i++)
 	{
 		m = m + fitness_rate.at(i) / fitness_sum;
 		if (r <= m)
@@ -82,13 +82,13 @@ Solution GeneticAlgorithm::generateSolution(std::vector<BoolTable> intialSolutio
 	std::vector<BoolTable>::iterator init_it;
 	new_population.assign(intialSolutions.begin(),intialSolutions.end());
 	Solution minCost;
-	minCost.flowSolution.totalCost = LONG_MAX;
+	minCost.flowSolution.totalCost = -1;
 	
 	for (std::vector<BoolTable>::const_iterator it = new_population.cbegin(); it != new_population.cend(); it++)
 	{
 		FlowSolution temp = SmallestCostFlow::getSmallestCostFlow(*it, g);
 		UIntTable servers;
-		for (int i = 0; i < it->size(); i++)
+		for (unsigned int i(0); i != it->size(); i++)
 			if (it->at(i))
 				servers.push_back(i);
 		temp.totalCost += g.costPerServer * servers.size();
@@ -161,7 +161,7 @@ Solution GeneticAlgorithm::generateSolution(std::vector<BoolTable> intialSolutio
 			{
 				FlowSolution temp = SmallestCostFlow::getSmallestCostFlow(*it, g);
 				UIntTable servers;
-				for (int i = 0; i < it->size(); i++)
+				for (unsigned int i(0); i != it->size(); i++)
 					if (it->at(i))
 						servers.push_back(i);
 				temp.totalCost += g.costPerServer * servers.size();
@@ -177,7 +177,7 @@ Solution GeneticAlgorithm::generateSolution(std::vector<BoolTable> intialSolutio
 		}
 
 		ftime(&rawtime);
-		interval_ms += SubFun::timeb2ms(rawtime);
+		interval_ms += timeb2ms(rawtime);
 		if (interval_ms - last_interval_ms > maxTime)
 			maxTime = interval_ms - last_interval_ms;
 		lastTime *= raw_count_it_sum;
@@ -198,7 +198,7 @@ Solution GeneticAlgorithm::generateSolution(std::vector<BoolTable> intialSolutio
 	{
 		FlowSolution temp = SmallestCostFlow::getSmallestCostFlow(*it, g);
 		UIntTable servers;
-		for (int i = 0; i < it->size(); i++)
+		for (unsigned int i(0); i != it->size(); i++)
 			if (it->at(i))
 				servers.push_back(i);
 		temp.totalCost += g.costPerServer * servers.size();
@@ -210,23 +210,11 @@ Solution GeneticAlgorithm::generateSolution(std::vector<BoolTable> intialSolutio
 		}
 
 		ftime(&rawtime);
-		interval_ms += SubFun::timeb2ms(rawtime);
+		interval_ms += timeb2ms(rawtime);
 		if (interval_ms - last_interval_ms > maxTime)
 			maxTime = interval_ms - last_interval_ms;
 		last_interval_ms = interval_ms;
 	}
 
 	return std::move(minCost);
-}
-
-unsigned long GeneticAlgorithm::SubFun::timeb2ms(const timeb & t)
-{
-	static int ms = t.millitm;
-	static unsigned long s = t.time;
-	int out_ms = t.millitm - ms;
-	unsigned long out_s = t.time - s;
-	ms = t.millitm;
-	s = t.time;
-
-	return out_s * 1000 + out_ms;
 }
