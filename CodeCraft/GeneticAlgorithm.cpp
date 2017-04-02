@@ -82,7 +82,7 @@ Solution GeneticAlgorithm::generateSolution(std::vector<BoolTable> intialSolutio
 	new_population.assign(intialSolutions.begin(),intialSolutions.end());
 	Solution minCost;
 	minCost.flowSolution.totalCost = LONG_MAX;
-
+	time_t lastTime = interval_s;
 	for (std::vector<BoolTable>::const_iterator it = new_population.cbegin(); it != new_population.cend(); it++)
 	{
 		FlowSolution temp = SmallestCostFlow::getSmallestCostFlow(*it, g);
@@ -181,7 +181,8 @@ Solution GeneticAlgorithm::generateSolution(std::vector<BoolTable> intialSolutio
 			interval_ms += 1000;
 			interval_s -= 1;
 		}
-	} while (interval_s < SubFun::limit_time);
+		lastTime = interval_s - lastTime;
+	} while (interval_s + lastTime < SubFun::limit_time);
 	//调用精确算法；
 	// to do
 	return std::move(minCost);
