@@ -15,6 +15,7 @@ struct Graph;
 using BoolTable = std::vector<bool>;
 using UIntTable = std::vector<unsigned int>;
 using IntTable = std::vector<int>;
+using UInt2UIntTable = std::map<unsigned int, unsigned int>;
 using GraphMatrix = std::vector<std::vector<std::pair<int, int>>>;
 
 struct EdgeToNeedPointInfo
@@ -78,6 +79,7 @@ struct Graph
 	UIntTable getNodesUIntTable() const;
 	IntTable getNodesIntTable() const;
 	BoolTable getEdgesBoolTable() const;
+	UInt2UIntTable getNeeds() const;
 
 	std::vector<std::shared_ptr<Node>> nodes;
 	std::vector<std::shared_ptr<Edge>> edges;
@@ -85,5 +87,6 @@ struct Graph
 
 	std::unordered_set<unsigned int> needPoints;
 
+	UInt2UIntTable needs;
 	GraphMatrix graphMatrix;
 };

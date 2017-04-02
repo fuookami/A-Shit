@@ -14,6 +14,8 @@ struct FlowSolution
 {
 	std::vector<Flow> flows;
 	unsigned int totalCost;
+
+	bool isValid(const Graph &g);
 };
 
 namespace SmallestCostFlow

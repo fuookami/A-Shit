@@ -72,6 +72,8 @@ Graph::Graph(char * topo[MAX_EDGE_NUM])
 
 		graphMatrix[thisNode->id + 1][nodeNum].first = need;
 		graphMatrix[thisNode->id + 1][nodeNum].second = 0;
+
+		needs[node] = need;
 	}
 }
 
@@ -97,4 +99,9 @@ std::vector<bool> Graph::getEdgesBoolTable() const
 {
 	static BoolTable edgesBoolTable(edges.size(), false);
 	return edgesBoolTable;
+}
+
+UInt2UIntTable Graph::getNeeds() const
+{
+	return needs;
 }

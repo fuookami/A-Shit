@@ -7,7 +7,7 @@
 struct Solution
 {
 	FlowSolution flowSolution;
-	std::vector<unsigned int> servers; // node id
+	UIntTable servers; // node id
 
 	std::string to_string(const Graph &g) const;
 };
@@ -22,7 +22,7 @@ namespace GeneticAlgorithm
 		static const double mutation_rate = 0.1;
 		static const double cross_rate = 0.9;
 		static const int pop_size = 50;
-		static const int iteration = 10;
+		static const int iteration = 30;
 		static const int opt = 5;
 	};
 };

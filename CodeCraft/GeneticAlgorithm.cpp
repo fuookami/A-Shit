@@ -67,6 +67,8 @@ std::string Solution::to_string(const Graph &g) const
 
 Solution GeneticAlgorithm::generateSolution(std::vector<BoolTable> intialSolutions, const Graph & g)
 {
+	static std::random_device rd;
+
 	if (intialSolutions.empty())
 		return std::move(Solution());
 	
@@ -80,6 +82,23 @@ Solution GeneticAlgorithm::generateSolution(std::vector<BoolTable> intialSolutio
 	new_population.assign(intialSolutions.begin(),intialSolutions.end());
 	Solution minCost;
 	minCost.flowSolution.totalCost = LONG_MAX;
+
+	for (std::vector<BoolTable>::const_iterator it = new_population.cbegin(); it != new_population.cend(); it++)
+	{
+		FlowSolution temp = SmallestCostFlow::getSmallestCostFlow(*it, g);
+		UIntTable servers;
+		for (int i = 0; i < it->size(); i++)
+			if (it->at(i))
+				servers.push_back(i);
+		temp.totalCost += g.costPerServer * servers.size();
+
+		if (temp.isValid(g) && temp.totalCost < minCost.flowSolution.totalCost)
+		{
+			minCost.flowSolution = std::move(temp);
+			minCost.servers = std::move(servers);
+		}
+	}
+
 	int count_it = 0;
 	do{
 		int count = 0;
@@ -107,7 +126,7 @@ Solution GeneticAlgorithm::generateSolution(std::vector<BoolTable> intialSolutio
 			if (Rand() < SubFun::cross_rate)
 			{
 				int front;
-				while ((front = (rand() % father.size()) - SubFun::opt) < 0);
+				while ((front = (rd() % father.size()) - SubFun::opt) < 0);
 				for (int i = front; i <= front + SubFun::opt; i++)
 				{
 					bool temp = father.at(i);
@@ -118,8 +137,8 @@ Solution GeneticAlgorithm::generateSolution(std::vector<BoolTable> intialSolutio
 			if (Rand() < SubFun::mutation_rate)
 			{
 
-				while(g.nodes.at(father_id = (rand() % father.size()))->isNeed);
-				while(g.nodes.at(mother_id = (rand() % father.size()))->isNeed);
+				while(g.nodes.at(father_id = (rd() % (father.size() - 1)))->isNeed);
+				while(g.nodes.at(mother_id = (rd() % (father.size() - 1)))->isNeed);
 				if (father.at(father_id))
 					father.at(father_id) = false;
 				else father.at(father_id) = true;
@@ -139,18 +158,16 @@ Solution GeneticAlgorithm::generateSolution(std::vector<BoolTable> intialSolutio
 			for (std::vector<BoolTable>::const_iterator it = new_population.cbegin(); it != new_population.cend(); it++)
 			{
 				FlowSolution temp = SmallestCostFlow::getSmallestCostFlow(*it, g);
-				if (temp.totalCost)
+				UIntTable servers;
+				for (int i = 0; i < it->size(); i++)
+					if (it->at(i))
+						servers.push_back(i);
+				temp.totalCost += g.costPerServer * servers.size();
+
+				if (temp.isValid(g) && temp.totalCost < minCost.flowSolution.totalCost)
 				{
-					if (temp.totalCost < minCost.flowSolution.totalCost)
-					{
-						minCost.flowSolution = std::move(temp);
-						minCost.servers.clear();
-						for (int i = 0; i < it->size(); i++)
-						{
-							if (it->at(i))
-								minCost.servers.push_back(i);
-						}
-					}
+					minCost.flowSolution = std::move(temp);
+					minCost.servers = std::move(servers);
 				}
 			}
 			//Solution = SmallestCostFlow::getSmallestCostFlow(new_population);

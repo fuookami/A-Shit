@@ -40,10 +40,8 @@ void SmallestCostFlow::SubFun::initGraph(BoolTable & server, const Graph & g)
 					graph[i][j].first = INT_MAX;
 				}
 			}
-			cout << i << " ";
 		}
 	}
-	cout << endl;
 }
 
 // find a path
@@ -130,12 +128,10 @@ void SmallestCostFlow::SubFun::minCostMaxFlow()
 				increase = graph[path[i]][path[i + 1]].first;
 			}
 			flow.edges.push_back(pGraph->nodes[path[i] - 1]->edges[path[i + 1] - 1]);
-			cout << path[i] - 1 << " ";
 		}
 		flow.edges.pop_back();
 
 		flow.flow = increase;
-		cout << "  \t" << increase << endl;
 
 		for (int i = 0; i < path.size() - 1; ++i)
 		{
@@ -163,3 +159,20 @@ void SmallestCostFlow::SubFun::minCostMaxFlow()
 	flowSolution.totalCost = minCost;
 }
 
+bool FlowSolution::isValid(const Graph & g)
+{
+	UInt2UIntTable needs(g.getNeeds());
+
+	for (std::vector<Flow>::const_iterator currIt(flows.cbegin()), edIt(flows.cend()); currIt != edIt; ++currIt)
+	{
+		if (currIt->edges.empty())
+			needs[currIt->serverNodeId] -= currIt->flow;
+		else
+			needs[currIt->edges.back()->nodes.second->id] -= currIt->flow;
+	}
+
+	for (UInt2UIntTable::const_iterator currIt(needs.cbegin()), edIt(needs.cend()); currIt != edIt; ++currIt)
+		if (currIt->second != 0)
+			return false;
+	return true;
+}
