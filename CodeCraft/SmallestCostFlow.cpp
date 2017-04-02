@@ -9,13 +9,14 @@ namespace SmallestCostFlow
 	static size_t nodeSize;
 	static int minCost = 0;
 	const Graph * pGraph;
+	static FlowSolution flowSolution;
 }
 
 FlowSolution SmallestCostFlow::getSmallestCostFlow(BoolTable servers, const Graph & g)
 {
 	SubFun::initGraph(servers, g);
 	SubFun::minCostMaxFlow();
-	return SubFun::flowSolution;
+	return flowSolution;
 }
 
 void SmallestCostFlow::SubFun::initGraph(BoolTable & server, const Graph & g)
@@ -39,8 +40,10 @@ void SmallestCostFlow::SubFun::initGraph(BoolTable & server, const Graph & g)
 					graph[i][j].first = INT_MAX;
 				}
 			}
+			cout << i << " ";
 		}
 	}
+	cout << endl;
 }
 
 // find a path
@@ -117,7 +120,7 @@ void SmallestCostFlow::SubFun::minCostMaxFlow()
 		}
 
 		Flow flow;
-		flow.serverNodeId = path[0];
+		flow.serverNodeId = path[0] - 1;
 
 		int increase = INT_MAX;
 		for (int i = 0; i < path.size() - 1; ++i)
@@ -127,10 +130,12 @@ void SmallestCostFlow::SubFun::minCostMaxFlow()
 				increase = graph[path[i]][path[i + 1]].first;
 			}
 			flow.edges.push_back(pGraph->nodes[path[i]]->edges[path[i + 1]]);
+			cout << path[i]-1 << " ";
 		}
 		flow.edges.pop_back();
 
 		flow.flow = increase;
+		cout << "  \t" <<increase<< endl;
 
 		for (int i = 0; i < path.size() - 1; ++i)
 		{
