@@ -18,7 +18,7 @@ int RWS()
 {
 	double m = 0;
 	double  r = Rand();
-	for (int i = 0; i < fitness_rate.size(); i++)
+	for (unsigned int i(0); i < fitness_rate.size(); i++)
 	{
 		m = m + fitness_rate.at(i) / fitness_sum;
 		if (r <= m)
@@ -82,13 +82,13 @@ Solution GeneticAlgorithm::generateSolution(std::vector<BoolTable> intialSolutio
 	std::vector<BoolTable>::iterator init_it;
 	new_population.assign(intialSolutions.begin(),intialSolutions.end());
 	Solution minCost;
-	minCost.flowSolution.totalCost = LONG_MAX;
+	minCost.flowSolution.totalCost = -1;
 	
 	for (std::vector<BoolTable>::const_iterator it = new_population.cbegin(); it != new_population.cend(); it++)
 	{
 		FlowSolution temp = SmallestCostFlow::getSmallestCostFlow(*it, g);
 		UIntTable servers;
-		for (int i = 0; i < it->size(); i++)
+		for (unsigned int i(0); i != it->size(); i++)
 			if (it->at(i))
 				servers.push_back(i);
 		temp.totalCost += g.costPerServer * servers.size();
@@ -161,7 +161,7 @@ Solution GeneticAlgorithm::generateSolution(std::vector<BoolTable> intialSolutio
 			{
 				FlowSolution temp = SmallestCostFlow::getSmallestCostFlow(*it, g);
 				UIntTable servers;
-				for (int i = 0; i < it->size(); i++)
+				for (unsigned int i(0); i != it->size(); i++)
 					if (it->at(i))
 						servers.push_back(i);
 				temp.totalCost += g.costPerServer * servers.size();
@@ -198,7 +198,7 @@ Solution GeneticAlgorithm::generateSolution(std::vector<BoolTable> intialSolutio
 	{
 		FlowSolution temp = SmallestCostFlow::getSmallestCostFlow(*it, g);
 		UIntTable servers;
-		for (int i = 0; i < it->size(); i++)
+		for (unsigned int i(0); i != it->size(); i++)
 			if (it->at(i))
 				servers.push_back(i);
 		temp.totalCost += g.costPerServer * servers.size();
