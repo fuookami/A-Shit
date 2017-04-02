@@ -22,11 +22,11 @@ namespace SmallestCostFlow
 
 	namespace SubFun
 	{
-		void initGraph(BoolTable &server, const Graph &g);
+		void initGraph(FlowSolution &flowSolution, BoolTable &server, const Graph &g);
 
 		void dijkstra(std::vector<int> &distance, std::vector<int> &path);
 
-		void minCostMaxFlow();
+		void minCostMaxFlow(FlowSolution &flowSolution);
 
 		//void removeSourceNode();
 

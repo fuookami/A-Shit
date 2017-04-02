@@ -9,20 +9,19 @@ namespace SmallestCostFlow
 	static size_t nodeSize;
 	static int minCost = 0;
 	const Graph * pGraph;
-	static FlowSolution flowSolution;
 }
 
 FlowSolution SmallestCostFlow::getSmallestCostFlow(BoolTable servers, const Graph & g)
 {
-	SubFun::initGraph(servers, g);
-	SubFun::minCostMaxFlow();
-	return flowSolution;
+	FlowSolution flowSolution;
+	SubFun::initGraph(flowSolution, servers, g);
+	SubFun::minCostMaxFlow(flowSolution);
+	return std::move(flowSolution);
 }
 
-void SmallestCostFlow::SubFun::initGraph(BoolTable & server, const Graph & g)
+void SmallestCostFlow::SubFun::initGraph(FlowSolution &flowSolution, BoolTable & server, const Graph & g)
 {
 	minCost = 0;
-	flowSolution.flows.clear();
 	graph = g.graphMatrix;
 	pGraph = &g;
 	nodeSize = graph.size();
@@ -103,7 +102,7 @@ void SmallestCostFlow::SubFun::dijkstra(std::vector<int> &distance, std::vector<
 	reverse(path.begin(), path.end());
 }
 
-void SmallestCostFlow::SubFun::minCostMaxFlow()
+void SmallestCostFlow::SubFun::minCostMaxFlow(FlowSolution &flowSolution)
 {
 	Flow flow;
 
