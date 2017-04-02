@@ -53,10 +53,25 @@
     <Text Include="case4.txt">
       <Filter>资源文件</Filter>
     </Text>
-    <Text Include="result.txt">
+    <Text Include="result0.txt">
       <Filter>资源文件</Filter>
     </Text>
-    <Text Include="result0.txt">
+    <Text Include="result1.txt">
+      <Filter>资源文件</Filter>
+    </Text>
+    <Text Include="result2.txt">
+      <Filter>资源文件</Filter>
+    </Text>
+    <Text Include="result3.txt">
+      <Filter>资源文件</Filter>
+    </Text>
+    <Text Include="result4.txt">
+      <Filter>资源文件</Filter>
+    </Text>
+    <Text Include="lcase0.txt">
+      <Filter>资源文件</Filter>
+    </Text>
+    <Text Include="case5.txt">
       <Filter>资源文件</Filter>
     </Text>
   </ItemGroup>
