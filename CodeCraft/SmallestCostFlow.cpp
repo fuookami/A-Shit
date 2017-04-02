@@ -13,10 +13,13 @@ FlowSolution SmallestCostFlow::getSmallestCostFlow(BoolTable servers, Graph & g)
 void SmallestCostFlow::SubFun::initGraph(BoolTable & server, Graph & g)
 {
 	minCost = 0;
+	flowSolution.flows.clear();
 	nodeSize = g.nodes.size();
 	graph = &g;
 	unsigned int startNodexIndex = -1;
-	Node startNode(startNodexIndex);
+
+	graph->nodes.insert(graph->nodes.begin(), shared_ptr<Node>(new Node(startNodexIndex)));
+	Node &startNode(*graph->nodes[0].get());
 
 	// insert the source node
 	for (int i = 0; i < nodeSize; ++i)
@@ -28,17 +31,15 @@ void SmallestCostFlow::SubFun::initGraph(BoolTable & server, Graph & g)
 			startNode.edges.insert(make_pair(i, e));
 		}
 	}
-	graph->nodes.insert(graph->nodes.begin(), shared_ptr<Node>(&startNode));
+	
 	nodeSize++;
 }
 
 // find a path
-void SmallestCostFlow::SubFun::dijkstra()
+void SmallestCostFlow::SubFun::dijkstra(std::vector<int> &distance, std::vector<int> &nextNode)
 {
-	distance.clear();
-	nextNode.clear();
-	distance.insert(distance.begin(), nodeSize, INT_MAX);
-	nextNode.insert(nextNode.begin(), nodeSize, 0);
+	distance.assign(nodeSize, INT_MAX);
+	nextNode.assign(nodeSize, 0);
 	distance[nodeSize - 1] = 0;
 	nextNode[nodeSize - 1] = -1;
 
@@ -61,10 +62,14 @@ void SmallestCostFlow::SubFun::dijkstra()
 void SmallestCostFlow::SubFun::minCostMaxFlow()
 {
 	Flow flow;
+	// sum of cost per flow
+	static std::vector<int> distance;
+	// linked list for recording flow
+	static std::vector<int> nextNode;
 
 	while (true)
 	{
-		dijkstra();
+		dijkstra(distance, nextNode);
 		if (distance[0] == 0)
 		{
 			break;

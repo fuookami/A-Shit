@@ -32,7 +32,7 @@ struct Edge
 		flow(_flow), costPerFlow(_costPerFlow), nodes(std::make_pair(_node1, _node2)) {}
 	unsigned int id = 0;
 	unsigned int flow = 0;
-	unsigned int costPerFlow = 0;
+	int costPerFlow = 0;
 	Edge * reverseEdge;
 	std::pair<Node *, Node *> nodes = std::make_pair(nullptr, nullptr);
 
