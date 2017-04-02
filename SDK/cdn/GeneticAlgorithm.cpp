@@ -75,9 +75,9 @@ Solution GeneticAlgorithm::generateSolution(std::vector<BoolTable> intialSolutio
 	ftime(&rawtime);
 	unsigned long last_interval_ms(interval_ms);
 	unsigned long lastTime(0);
+	unsigned long maxTime(0);
 	unsigned int raw_count_it(0);
 	unsigned int raw_count_it_sum(0);
-	unsigned int max_mcmf_time(0);
 
 	std::vector<BoolTable>::iterator init_it;
 	new_population.assign(intialSolutions.begin(),intialSolutions.end());
@@ -98,12 +98,6 @@ Solution GeneticAlgorithm::generateSolution(std::vector<BoolTable> intialSolutio
 			minCost.flowSolution = std::move(temp);
 			minCost.servers = std::move(servers);
 		}
-
-		ftime(&rawtime);
-		interval_ms += timeb2ms(rawtime);
-		if (interval_ms - last_interval_ms > max_mcmf_time)
-			max_mcmf_time = interval_ms - last_interval_ms;
-		last_interval_ms = interval_ms;
 	}
 
 	int count_it = 0;
@@ -153,11 +147,8 @@ Solution GeneticAlgorithm::generateSolution(std::vector<BoolTable> intialSolutio
 					father.at(mother_id) = false;
 				else father.at(mother_id) = true;
 			}
-			if (GenerateIntialSolutions::SubFun::judgeNeedIsSatisfied(GenerateIntialSolutions::SubFun::calFlowTable(mother, g)))
-				new_population.push_back(mother);
-			if (GenerateIntialSolutions::SubFun::judgeNeedIsSatisfied(GenerateIntialSolutions::SubFun::calFlowTable(father, g)))
-				new_population.push_back(father);
-
+			new_population.push_back(mother);
+			new_population.push_back(father);
 			father.clear();
 			mother.clear();
 			count++;
@@ -166,8 +157,7 @@ Solution GeneticAlgorithm::generateSolution(std::vector<BoolTable> intialSolutio
 		if (++count_it == SubFun::iteration)
 		{
 			//调用精确算法；
-			for (std::vector<BoolTable>::const_iterator it = new_population.cbegin(); 
-				it != new_population.cend() && interval_ms + max_mcmf_time < SubFun::limit_time; it++)
+			for (std::vector<BoolTable>::const_iterator it = new_population.cbegin(); it != new_population.cend(); it++)
 			{
 				FlowSolution temp = SmallestCostFlow::getSmallestCostFlow(*it, g);
 				UIntTable servers;
@@ -181,19 +171,15 @@ Solution GeneticAlgorithm::generateSolution(std::vector<BoolTable> intialSolutio
 					minCost.flowSolution = std::move(temp);
 					minCost.servers = std::move(servers);
 				}
-
-				ftime(&rawtime);
-				interval_ms += timeb2ms(rawtime);
 			}
 			//Solution = SmallestCostFlow::getSmallestCostFlow(new_population);
 			count_it = 0;
-
-			if (interval_ms + max_mcmf_time > SubFun::limit_time)
-				break;
 		}
 
 		ftime(&rawtime);
 		interval_ms += timeb2ms(rawtime);
+		if (interval_ms - last_interval_ms > maxTime)
+			maxTime = interval_ms - last_interval_ms;
 		lastTime *= raw_count_it_sum;
 		++raw_count_it;
 		lastTime += (interval_ms - last_interval_ms) * raw_count_it;
@@ -201,13 +187,14 @@ Solution GeneticAlgorithm::generateSolution(std::vector<BoolTable> intialSolutio
 		lastTime /= raw_count_it_sum;
 		last_interval_ms = interval_ms;
 
+		if ((count_it + 1) == SubFun::iteration && interval_ms + maxTime > SubFun::limit_time)
+			break;
+
 	} while (interval_ms + lastTime < SubFun::limit_time);
 	
-	if (interval_ms + max_mcmf_time > SubFun::limit_time)
-		return std::move(minCost);
-
+	maxTime = 0;
 	for (std::vector<BoolTable>::const_iterator it = new_population.cbegin(); 
-		it != new_population.cend() && interval_ms + max_mcmf_time < SubFun::limit_time; it++)
+		it != new_population.cend() && interval_ms + maxTime < SubFun::limit_time; it++)
 	{
 		FlowSolution temp = SmallestCostFlow::getSmallestCostFlow(*it, g);
 		UIntTable servers;
@@ -224,6 +211,9 @@ Solution GeneticAlgorithm::generateSolution(std::vector<BoolTable> intialSolutio
 
 		ftime(&rawtime);
 		interval_ms += timeb2ms(rawtime);
+		if (interval_ms - last_interval_ms > maxTime)
+			maxTime = interval_ms - last_interval_ms;
+		last_interval_ms = interval_ms;
 	}
 
 	return std::move(minCost);

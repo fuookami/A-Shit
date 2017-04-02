@@ -1,5 +1,4 @@
 #include "GenerateIntialSolutions.h"
-#include <iostream>
 #include <deque>
 #include <algorithm>
 #include <random>
@@ -366,10 +365,20 @@ BoolTable GenerateIntialSolutions::SubFun::generateServerCombination(const std::
 	static std::random_device rd;
 	static std::mt19937 gen(rd());
 	static std::weibull_distribution<> dis(1, g.needPoints.size());
-
-	static auto judgeNodeIsNeeded([&g](const UInt2UIntTable &flowTable, const Node * const pNode)->bool
+	static auto judgeNeedIsSatisfied([](const std::unordered_map<unsigned int, unsigned int> &flowTable)->bool
 	{
-		for (UInt2UIntTable::const_iterator currIt(flowTable.cbegin()), edIt(flowTable.cend());
+		for (std::unordered_map<unsigned int, unsigned int>::const_iterator currIt(flowTable.cbegin()), edIt(flowTable.cend());
+			currIt != edIt; ++currIt)
+		{
+			if (currIt->second != 0)
+				return false;
+		}
+		return true;
+	});
+
+	static auto judgeNodeIsNeeded([&g](const std::unordered_map<unsigned int, unsigned int> &flowTable, const Node * const pNode)->bool
+	{
+		for (std::unordered_map<unsigned int, unsigned int>::const_iterator currIt(flowTable.cbegin()), edIt(flowTable.cend());
 			currIt != edIt; ++currIt)
 		{
 			if (currIt->second != 0 && pNode->preTreatInfo.find(currIt->first)->second.flag)
@@ -378,7 +387,10 @@ BoolTable GenerateIntialSolutions::SubFun::generateServerCombination(const std::
 		return false;
 	});
 
-	UInt2UIntTable flowTable(g.getNeeds());
+	std::unordered_map<unsigned int, unsigned int> flowTable;
+	for (std::unordered_set<unsigned int>::const_iterator currIt(g.needPoints.begin()), edIt(g.needPoints.end());
+		currIt != edIt; ++currIt)
+		flowTable.insert(std::make_pair(*currIt, g.nodes[*currIt].get()->need));
 	BoolTable solution(g.getNodesBoolTable());
 
 	for(;;)
@@ -412,43 +424,6 @@ BoolTable GenerateIntialSolutions::SubFun::generateServerCombination(const std::
 	}
 
 	return std::move(solution);
-}
-
-bool GenerateIntialSolutions::SubFun::judgeNeedIsSatisfied(const UInt2UIntTable & flowTable)
-{
-	for (UInt2UIntTable::const_iterator currIt(flowTable.cbegin()), edIt(flowTable.cend());
-		currIt != edIt; ++currIt)
-	{
-		if (currIt->second != 0)
-			return false;
-	}
-	return true;
-}
-
-UInt2UIntTable GenerateIntialSolutions::SubFun::calFlowTable(const BoolTable & servers, const Graph & g)
-{
-	UInt2UIntTable flowTable(g.getNeeds());
-	for (unsigned int i(0), j(servers.size()); i != j; ++i)
-	{
-		if (servers[i])
-		{
-			const Node &currNode(*g.nodes[i].get());
-
-			for (std::unordered_map<unsigned int, NodeToNeedPointInfo>::const_iterator currIt(currNode.preTreatInfo.cbegin()),
-				edIt(currNode.preTreatInfo.cend()); currIt != edIt; ++currIt)
-			{
-				if (currIt->second.flag)
-				{
-					if (flowTable.find(currIt->first)->second > currIt->second.maxFlowToNeedPoint)
-						flowTable.find(currIt->first)->second -= currIt->second.maxFlowToNeedPoint;
-					else
-						flowTable.find(currIt->first)->second = 0;
-				}
-			}
-		}
-	}
-
-	return std::move(flowTable);
 }
 
 double GenerateIntialSolutions::SubFun::calSolutionCost(BoolTable & currSolution, const Graph & g)
