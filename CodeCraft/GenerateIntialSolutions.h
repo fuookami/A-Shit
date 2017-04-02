@@ -18,6 +18,8 @@ namespace GenerateIntialSolutions
 		std::vector<BoolTable> selectServers(const std::vector<Node *> &nodes, const Graph &g);
 		BoolTable generateServerCombination(const std::vector<Node *> &nodes, const Graph &g);
 
+		bool judgeNeedIsSatisfied(const UInt2UIntTable &flowTable);
+		UInt2UIntTable calFlowTable(const BoolTable &servers, const Graph &g);
 		double calSolutionCost(BoolTable &currSolution, const Graph &g);
 	};
 };

@@ -18,10 +18,10 @@ namespace GeneticAlgorithm
 	namespace SubFun
 	{
 		// to do
-		static const unsigned long limit_time = 84000;
+		static const unsigned long limit_time = 85000;
 		static const double mutation_rate = 0.1;
 		static const double cross_rate = 0.9;
-		static const int pop_size = 50;
+		static const int pop_size = 15;
 		static const int iteration = 30;
 		static const int opt = 5;
 	};
