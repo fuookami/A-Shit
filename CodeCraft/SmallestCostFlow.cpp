@@ -1,6 +1,7 @@
 #include "SmallestCostFlow.h"
 #include <iostream>
 #include <algorithm>
+#include <queue>
 
 using namespace std;
 
@@ -11,6 +12,7 @@ namespace SmallestCostFlow
 	static int minCost = 0;
 	const Graph * pGraph;
 	static FlowSolution flowSolution;
+	static vector<int> _servers;
 }
 
 FlowSolution SmallestCostFlow::getSmallestCostFlow(BoolTable servers, const Graph & g)
@@ -20,7 +22,7 @@ FlowSolution SmallestCostFlow::getSmallestCostFlow(BoolTable servers, const Grap
 	return flowSolution;
 }
 
-void SmallestCostFlow::SubFun::initGraph(BoolTable & server, const Graph & g)
+void SmallestCostFlow::SubFun::initGraph(BoolTable & servers, const Graph & g)
 {
 	minCost = 0;
 	flowSolution.flows.clear();
@@ -30,17 +32,11 @@ void SmallestCostFlow::SubFun::initGraph(BoolTable & server, const Graph & g)
 
 	for (unsigned int i = 0; i != nodeSize - 1; ++i)
 	{
-		if (server[i])
+		if (servers[i])
 		{
 			graph[0][i + 1].first = INT_MAX;
 			graph[0][i + 1].second = 0;
-			for (unsigned int j = 1; j != nodeSize - 1; ++j)
-			{
-				if (graph[i][j].first != 0)
-				{
-					graph[i][j].first = INT_MAX;
-				}
-			}
+			_servers.push_back(i);
 		}
 	}
 }
@@ -102,6 +98,79 @@ void SmallestCostFlow::SubFun::dijkstra(std::vector<int> &distance, std::vector<
 	reverse(path.begin(), path.end());
 }
 
+void SmallestCostFlow::SubFun::priorityQueueDijkstra(std::vector<int>& distance, std::vector<int>& path)
+{
+	distance.assign(nodeSize, INT_MAX);
+	vector<int> nextv;
+	nextv.assign(pGraph->edges.size() + _servers.size() + 1, -1);
+	vector<int> tail;
+	tail.assign(pGraph->edges.size() + _servers.size() + 1, -1);
+	vector<int> val;
+	val.assign(pGraph->edges.size() + _servers.size() + 1, -1);
+	vector<int> head;
+	head.assign(nodeSize, 0);
+	vector<int> prev;
+	prev.assign(nodeSize, -1);
+
+	path.clear();
+
+	for (size_t i = 0; i < _servers.size(); ++i)
+	{
+		int _size = i + 1;
+		int u = pGraph->edges[i]->nodes.first->id + 1;
+		int v = pGraph->edges[i]->nodes.second->id + 1;
+		nextv[_size] = head[0];
+		head[0] = _size;
+		tail[_size] = _servers[i];
+		val[_size] = 0;
+	}
+
+	for (unsigned int i = 0; i < pGraph->edges.size(); ++i)
+	{
+		int _size = i + 1 + _servers.size();
+		int u = pGraph->edges[i]->nodes.first->id + 1;
+		int v = pGraph->edges[i]->nodes.second->id + 1;
+		if (graph[u][v].second == INT_MAX)
+		{
+			continue;
+		}
+		nextv[_size] = head[u];
+		head[u] = _size;
+		tail[_size] = v;
+		val[_size] = pGraph->edges[i]->costPerFlow;
+	}
+
+	priority_queue<int> priorityQueue;
+	priorityQueue.push(0);
+	distance[0] = 0;
+	while (!priorityQueue.empty())
+	{
+		int topNode = priorityQueue.top();
+		priorityQueue.pop();
+		for (int i = head[topNode]; i != 0; i = nextv[i])
+		{
+			int j = tail[i];
+			if (distance[j] > distance[topNode] + val[i])
+			{
+				distance[j] = distance[topNode] + val[i];
+				priorityQueue.push(j);
+				prev[j] = topNode;
+			}
+		}
+	}
+	int k = nodeSize - 1;
+	if (prev[k] == -1)
+	{
+		return;
+	}
+	while (k != 0)
+	{
+		path.push_back(k);
+		k = prev[k];
+	}
+	reverse(path.begin(), path.end());
+}
+
 void SmallestCostFlow::SubFun::minCostMaxFlow()
 {
 	Flow flow;
@@ -112,7 +181,7 @@ void SmallestCostFlow::SubFun::minCostMaxFlow()
 
 	while (true)
 	{
-		dijkstra(distance, path);
+		priorityQueueDijkstra(distance, path);
 		if (distance[nodeSize - 1] >= INT_MAX)
 		{
 			break;

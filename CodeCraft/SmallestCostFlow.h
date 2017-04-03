@@ -28,6 +28,8 @@ namespace SmallestCostFlow
 
 		void dijkstra(std::vector<int> &distance, std::vector<int> &path);
 
+		void priorityQueueDijkstra(std::vector<int> &distance, std::vector<int> &path);
+
 		void minCostMaxFlow();
 
 		//void removeSourceNode();
